@@ -42,7 +42,7 @@ def get_level_color(score):
     if score >= 81:
         return Fore.GREEN
     elif score >= 61:
-        return Fore.GREEN
+        return Fore.CYAN
     elif score >= 41:
         return Fore.YELLOW
     elif score >= 21:
