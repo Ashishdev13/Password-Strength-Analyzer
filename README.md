@@ -4,7 +4,7 @@ A Python-based cybersecurity tool that analyzes password strength, detects commo
 
 > **Educational use only.**
 
-## Screenshots / Demo
+## Demo
 
 ```
 ============================================================
