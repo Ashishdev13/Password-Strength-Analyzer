@@ -39,21 +39,22 @@ def print_banner():
 
 
 def get_level_color(score):
-    if score >= 81:
+    if score >= 80:
         return Fore.GREEN
-    elif score >= 61:
+    elif score >= 60:
         return Fore.CYAN
-    elif score >= 41:
+    elif score >= 40:
         return Fore.YELLOW
-    elif score >= 21:
-        return Fore.RED
     else:
         return Fore.RED
 
 
 def display_results(password, result):
     """Display analysis results in a formatted way."""
-    masked = password[0] + '*' * (len(password) - 2) + password[-1] if len(password) > 2 else '***'
+    if len(password) > 2:
+        masked = password[0] + '*' * (len(password) - 2) + password[-1]
+    else:
+        masked = '*' * len(password)
 
     print()
     print(colorize(f"  Password      : {masked}", Fore.WHITE))
@@ -136,7 +137,8 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='Examples:\n  python analyzer.py\n  python analyzer.py --password "MyPass123!"\n  python analyzer.py --file passwords.txt'
     )
-    parser.add_argument('--password', '-p', type=str, help='Password to analyze')
+    parser.add_argument('--password', '-p', type=str,
+                        help='Password to analyze (WARNING: visible in shell history and process list; prefer interactive mode)')
     parser.add_argument('--file', '-f', type=str, help='File containing passwords (one per line)')
     args = parser.parse_args()
 

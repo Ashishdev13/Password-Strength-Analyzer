@@ -35,19 +35,23 @@ class BreachChecker:
     def check(self, password: str) -> dict:
         """
         Check if a password appears in the simulated breach database.
-        Uses the k-anonymity model: only SHA-1 prefix is compared.
+        Uses the k-anonymity model: only SHA-1 prefix is compared initially,
+        then the suffix is matched locally — the full hash never leaves the client.
         """
         sha1_hash = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
         prefix = sha1_hash[:5]
         suffix = sha1_hash[5:]
 
-        # Simulate querying the API: get all hashes with same prefix
-        matching_hashes = {h for h in SIMULATED_BREACH_HASHES if h.startswith(prefix)}
+        # Step 1: Simulate API query — return all hashes sharing the same 5-char prefix
+        prefix_matches = {h for h in SIMULATED_BREACH_HASHES if h.startswith(prefix)}
 
-        found = sha1_hash in SIMULATED_BREACH_HASHES
+        # Step 2: Check if the full hash suffix matches any returned result
+        found = any(h[5:] == suffix for h in prefix_matches)
+
         return {
             'found': found,
             'hash_prefix': prefix,
+            'matches_returned': len(prefix_matches),
             'model': 'k-anonymity (simulated)',
             'note': 'Real check: https://api.pwnedpasswords.com/range/' + prefix
         }

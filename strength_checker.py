@@ -2,30 +2,36 @@
 """
 Strength Checker Module - Core password strength analysis engine.
 """
-import re, os
+import os
+import re
+from typing import Any
+
 from entropy import EntropyCalculator
 from pattern_detector import PatternDetector
 
 COMMON_PASSWORDS_FILE = os.path.join(os.path.dirname(__file__), 'common_passwords.txt')
 
-def load_common_passwords():
+
+def load_common_passwords() -> set[str]:
     try:
         with open(COMMON_PASSWORDS_FILE, 'r') as f:
             return set(line.strip().lower() for line in f if line.strip())
     except FileNotFoundError:
         return set()
 
+
 COMMON_PASSWORDS = load_common_passwords()
+
 
 class StrengthChecker:
     MAX_SCORE = 100
     SPECIAL_CHARS = set('!@#$%^&*()_+-=[]{}|;<>?,./~`"')
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.entropy_calc = EntropyCalculator()
         self.pattern_detector = PatternDetector()
 
-    def analyze(self, password):
+    def analyze(self, password: str) -> dict[str, Any]:
         scores = self._calc_scores(password)
         penalty = self._calc_penalty(password)
         bonus = self._calc_bonus(password)
@@ -48,50 +54,92 @@ class StrengthChecker:
             'recommendations': self._recommendations(password, scores, patterns, is_common, entropy)
         }
 
-    def _calc_scores(self, p):
-        s = {}
-        n = len(p)
-        s['length'] = 25 if n >= 20 else (20 if n >= 16 else (15 if n >= 12 else (10 if n >= 10 else (5 if n >= 8 else max(0, n-4)))))
-        uc = sum(1 for c in p if c.isupper())
-        lc = sum(1 for c in p if c.islower())
-        dc = sum(1 for c in p if c.isdigit())
-        sc = sum(1 for c in p if c in self.SPECIAL_CHARS)
-        s['uppercase'] = min(10, uc * 3) if uc else 0
-        s['lowercase'] = min(10, lc * 2) if lc else 0
-        s['digits'] = min(10, dc * 3) if dc else 0
-        s['special'] = min(15, sc * 4) if sc else 0
-        return s
+    def _calc_scores(self, password: str) -> dict[str, int]:
+        scores: dict[str, int] = {}
+        length = len(password)
 
-    def _calc_bonus(self, p):
-        types = sum([any(c.isupper() for c in p), any(c.islower() for c in p),
-                     any(c.isdigit() for c in p), any(c in self.SPECIAL_CHARS for c in p)])
-        return 10 if types == 4 else (5 if types == 3 else 0)
+        if length >= 20:
+            scores['length'] = 25
+        elif length >= 16:
+            scores['length'] = 20
+        elif length >= 12:
+            scores['length'] = 15
+        elif length >= 10:
+            scores['length'] = 10
+        elif length >= 8:
+            scores['length'] = 5
+        else:
+            scores['length'] = max(0, length - 4)
 
-    def _calc_penalty(self, p):
-        pen = 0
-        if re.search(r'(.)\1{2,}', p): pen += 10
-        if re.search(r'(012|123|234|345|456|567|678|789)', p): pen += 5
-        if re.search(r'(abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz)', p.lower()): pen += 5
-        for w in ['qwerty','asdfgh','zxcvbn','qazwsx']:
-            if w in p.lower(): pen += 10
-        return pen
+        upper_count = sum(1 for c in password if c.isupper())
+        lower_count = sum(1 for c in password if c.islower())
+        digit_count = sum(1 for c in password if c.isdigit())
+        special_count = sum(1 for c in password if c in self.SPECIAL_CHARS)
 
-    def _level(self, score):
-        if score >= 81: return 'VERY STRONG'
-        if score >= 61: return 'STRONG'
-        if score >= 41: return 'MODERATE'
-        if score >= 21: return 'WEAK'
+        scores['uppercase'] = min(10, upper_count * 3) if upper_count else 0
+        scores['lowercase'] = min(10, lower_count * 2) if lower_count else 0
+        scores['digits'] = min(10, digit_count * 3) if digit_count else 0
+        scores['special'] = min(15, special_count * 4) if special_count else 0
+        return scores
+
+    def _calc_bonus(self, password: str) -> int:
+        char_types = sum([
+            any(c.isupper() for c in password),
+            any(c.islower() for c in password),
+            any(c.isdigit() for c in password),
+            any(c in self.SPECIAL_CHARS for c in password),
+        ])
+        if char_types == 4:
+            return 10
+        if char_types == 3:
+            return 5
+        return 0
+
+    def _calc_penalty(self, password: str) -> int:
+        penalty = 0
+        if re.search(r'(.)\1{2,}', password):
+            penalty += 10
+        if re.search(r'(012|123|234|345|456|567|678|789)', password):
+            penalty += 5
+        if re.search(
+            r'(abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz)',
+            password.lower()
+        ):
+            penalty += 5
+        for walk in ['qwerty', 'asdfgh', 'zxcvbn', 'qazwsx']:
+            if walk in password.lower():
+                penalty += 10
+        return penalty
+
+    def _level(self, score: int) -> str:
+        if score >= 80:
+            return 'VERY STRONG'
+        if score >= 60:
+            return 'STRONG'
+        if score >= 40:
+            return 'MODERATE'
+        if score >= 20:
+            return 'WEAK'
         return 'VERY WEAK'
 
-    def _recommendations(self, p, scores, patterns, is_common, entropy):
-        r = []
-        if is_common: r.append('This password is in common breach lists — change it immediately')
-        if len(p) < 12: r.append('Use at least 12 characters (16+ recommended)')
-        if scores['uppercase'] == 0: r.append('Add uppercase letters (A-Z)')
-        if scores['digits'] == 0: r.append('Add numbers (0-9)')
-        if scores['special'] == 0: r.append('Add special characters (!@#$%^&*)')
-        if entropy['bits'] < 50: r.append('Increase complexity — entropy is too low (<50 bits)')
+    def _recommendations(self, password: str, scores: dict, patterns: list,
+                         is_common: bool, entropy: dict) -> list[str]:
+        recs: list[str] = []
+        if is_common:
+            recs.append('This password is in common breach lists — change it immediately')
+        if len(password) < 12:
+            recs.append('Use at least 12 characters (16+ recommended)')
+        if scores['uppercase'] == 0:
+            recs.append('Add uppercase letters (A-Z)')
+        if scores['digits'] == 0:
+            recs.append('Add numbers (0-9)')
+        if scores['special'] == 0:
+            recs.append('Add special characters (!@#$%^&*)')
+        if entropy['bits'] < 50:
+            recs.append('Increase complexity — entropy is too low (<50 bits)')
         for _, ok, msg in patterns:
-            if not ok: r.append(f'Avoid: {msg}')
-        if not r: r.append('Great password! Store it securely in a password manager.')
-        return r[:5]
+            if not ok:
+                recs.append(f'Avoid: {msg}')
+        if not recs:
+            recs.append('Great password! Store it securely in a password manager.')
+        return recs[:5]
