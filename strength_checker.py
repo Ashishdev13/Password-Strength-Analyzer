@@ -99,7 +99,7 @@ class StrengthChecker:
         penalty = 0
         if re.search(r'(.)\1{2,}', password):
             penalty += 10
-        if re.search(r'(012|123|234|345|456|567|678|789)', password):
+        if re.search(r'(012|123|234|345|456|567|678|789|987|876|765|654|543|432|321|210)', password):
             penalty += 5
         if re.search(
             r'(abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz)',
@@ -131,6 +131,8 @@ class StrengthChecker:
             recs.append('Use at least 12 characters (16+ recommended)')
         if scores['uppercase'] == 0:
             recs.append('Add uppercase letters (A-Z)')
+        if scores['lowercase'] == 0:
+            recs.append('Add lowercase letters (a-z)')
         if scores['digits'] == 0:
             recs.append('Add numbers (0-9)')
         if scores['special'] == 0:
