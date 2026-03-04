@@ -99,6 +99,10 @@ class TestStrengthChecker:
         result = self.checker.analyze('xx123yy')
         assert result['scores']['penalty'] >= 5
 
+    def test_descending_numbers_penalty(self):
+        result = self.checker.analyze('xx987yy')
+        assert result['scores']['penalty'] >= 5
+
     def test_keyboard_walk_penalty(self):
         result = self.checker.analyze('myqwertypass')
         assert result['scores']['penalty'] >= 10
@@ -123,6 +127,11 @@ class TestStrengthChecker:
     def test_no_excess_recommendations(self):
         result = self.checker.analyze('a')
         assert len(result['recommendations']) <= 5
+
+    def test_recommends_lowercase_when_missing(self):
+        result = self.checker.analyze('ABCXYZ123!')
+        recs = result['recommendations']
+        assert any('lowercase' in r.lower() for r in recs)
 
     def test_strong_password_congratulated(self):
         result = self.checker.analyze('X9$kL!mP2@qW7#nRvB')
