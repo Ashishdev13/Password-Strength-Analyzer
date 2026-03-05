@@ -14,7 +14,7 @@
 
 The **Password Strength Analyzer** is a modular, Python-based CLI tool that evaluates password security through multi-factor scoring, entropy analysis, pattern detection, common password matching, and a simulated breach database check using the HIBP k-anonymity model.
 
-This project was built to demonstrate how security professionals and developers assess password strength — the same principles used by password managers, identity platforms, and NIST-aligned authentication systems to enforce secure credential policies.
+This project was built to demonstrate how security professionals and developers assess password strength - the same principles used by password managers, identity platforms, and NIST-aligned authentication systems to enforce secure credential policies.
 
 ---
 
@@ -22,13 +22,13 @@ This project was built to demonstrate how security professionals and developers 
 
 | Concept | Description |
 |---------|-------------|
-| **Shannon Entropy** | Calculates information entropy (E = L x log2(R)) to quantify password randomness — higher bits means more brute-force resistance |
+| **Shannon Entropy** | Calculates information entropy (E = L x log2(R)) to quantify password randomness - higher bits means more brute-force resistance |
 | **K-Anonymity Model** | Simulates the Have I Been Pwned (HIBP) API approach where only the first 5 characters of a SHA-1 hash are sent, so the full password is never transmitted |
 | **Pattern Detection** | Identifies keyboard walks (qwerty, asdfgh), sequential characters (abc, 123), repeated characters (aaa), and date patterns (2024, 0101) |
-| **Common Password Lists** | Checks against the top 1000 most common passwords from real-world breach databases — passwords found are immediately capped to a low score |
+| **Common Password Lists** | Checks against the top 1000 most common passwords from real-world breach databases - passwords found are immediately capped to a low score |
 | **Multi-Factor Scoring** | Scores based on length, character variety (upper/lower/digit/special), with bonuses for mixing all types and penalties for weak patterns |
-| **Secure Input Handling** | Interactive mode uses `getpass` to hide password input from the terminal — prevents shoulder surfing and terminal history leakage |
-| **Modular Architecture** | Each analysis technique is an independent module — entropy, patterns, breach checking, and scoring are all decoupled and independently testable |
+| **Secure Input Handling** | Interactive mode uses `getpass` to hide password input from the terminal - prevents shoulder surfing and terminal history leakage |
+| **Modular Architecture** | Each analysis technique is an independent module - entropy, patterns, breach checking, and scoring are all decoupled and independently testable |
 
 ---
 
@@ -85,7 +85,7 @@ python analyzer.py
 # Analyze a specific password (WARNING: visible in shell history)
 python analyzer.py --password "MyP@ssw0rd!"
 
-# Batch mode — analyze multiple passwords from a file
+# Batch mode - analyze multiple passwords from a file
 python analyzer.py --file passwords.txt
 ```
 
@@ -93,7 +93,7 @@ python analyzer.py --file passwords.txt
 
 | Flag | Short | Description |
 |------|-------|-------------|
-| `--password` | `-p` | Password to analyze (visible in shell history — prefer interactive mode) |
+| `--password` | `-p` | Password to analyze (visible in shell history - prefer interactive mode) |
 | `--file` | `-f` | File containing passwords to analyze (one per line) |
 
 ### Sample Output
@@ -184,7 +184,7 @@ python analyzer.py --file passwords.txt
 1. Hash the password with SHA-1
 2. Take the first 5 characters of the hex hash
 3. Query only those 5 chars against the database
-4. Match the suffix locally — the full hash is never exposed
+4. Match the suffix locally - the full hash is never exposed
 5. In production, this queries `https://api.pwnedpasswords.com/range/{prefix}`
 
 ---
@@ -221,11 +221,11 @@ pytest --cov=. --cov-report=term-missing
 
 These tests verify the fixes for vulnerabilities found during code review:
 
-- **K-anonymity correctness** — breach check properly filters by hash prefix before matching suffix (verifies dead code fix)
-- **Unreachable level fix** — "VERY STRONG" level is achievable with max score (verifies threshold alignment)
-- **Short password masking** — passwords under 3 chars are fully masked, preventing information leakage
-- **Common password cap** — passwords found in breach lists are immediately capped to score 15 regardless of complexity
-- **Hash prefix isolation** — prefix + suffix always reconstructs the full SHA-1 hash (verifies k-anonymity model integrity)
+- **K-anonymity correctness** - breach check properly filters by hash prefix before matching suffix (verifies dead code fix)
+- **Unreachable level fix** - "VERY STRONG" level is achievable with max score (verifies threshold alignment)
+- **Short password masking** - passwords under 3 chars are fully masked, preventing information leakage
+- **Common password cap** - passwords found in breach lists are immediately capped to score 15 regardless of complexity
+- **Hash prefix isolation** - prefix + suffix always reconstructs the full SHA-1 hash (verifies k-anonymity model integrity)
 
 ---
 
@@ -239,11 +239,11 @@ These tests verify the fixes for vulnerabilities found during code review:
 
 Key fixes applied:
 
-- **K-anonymity simulation** — was bypassing prefix filter and checking full database directly; fixed to properly filter by prefix then match suffix
-- **Unreachable strength level** — max score was 80 but "VERY STRONG" threshold was 81; aligned thresholds
-- **CLI security warning** — `--password` flag exposes password in shell history; added warning in help text
-- **Short password masking** — edge case for passwords under 3 chars; now fully masks instead of partial display
-- **Code quality** — refactored nested ternaries, added type hints, split multi-imports (PEP 8), replaced cryptic variable names
+- **K-anonymity simulation** - was bypassing prefix filter and checking full database directly; fixed to properly filter by prefix then match suffix
+- **Unreachable strength level** - max score was 80 but "VERY STRONG" threshold was 81; aligned thresholds
+- **CLI security warning** - `--password` flag exposes password in shell history; added warning in help text
+- **Short password masking** - edge case for passwords under 3 chars; now fully masks instead of partial display
+- **Code quality** - refactored nested ternaries, added type hints, split multi-imports (PEP 8), replaced cryptic variable names
 
 ---
 
@@ -275,9 +275,9 @@ Password-Strength-Analyzer/
 ## Resources
 
 - [OWASP Password Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
-- [NIST SP 800-63B — Digital Identity Guidelines](https://pages.nist.gov/800-63-3/sp800-63b.html)
+- [NIST SP 800-63B - Digital Identity Guidelines](https://pages.nist.gov/800-63-3/sp800-63b.html)
 - [Have I Been Pwned API v3](https://haveibeenpwned.com/API/v3)
-- [Shannon Entropy — Wikipedia](https://en.wikipedia.org/wiki/Entropy_(information_theory))
+- [Shannon Entropy - Wikipedia](https://en.wikipedia.org/wiki/Entropy_(information_theory))
 
 ---
 
@@ -285,7 +285,7 @@ Password-Strength-Analyzer/
 
 > **This tool is provided for educational and authorized security research purposes only.**
 >
-> The techniques demonstrated in this project — including password entropy analysis, breach database simulation, and pattern detection — are standard methods used by password managers, identity platforms, and security auditors to enforce strong credential policies.
+> The techniques demonstrated in this project - including password entropy analysis, breach database simulation, and pattern detection - are standard methods used by password managers, identity platforms, and security auditors to enforce strong credential policies.
 >
 > **Do not use this tool to analyze passwords you do not own or have explicit permission to test.** The simulated breach database is for demonstration only and does not represent real breach data. Always use a password manager for storing real credentials.
 >
