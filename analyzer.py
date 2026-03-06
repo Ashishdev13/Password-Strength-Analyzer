@@ -126,8 +126,8 @@ def batch_analyze(filepath):
         print(colorize(f"\n  Analyzing {len(passwords)} passwords from {filepath}...\n", Fore.CYAN))
         for pwd in passwords:
             analyze_password(pwd)
-    except FileNotFoundError:
-        print(colorize(f"  Error: File '{filepath}' not found.", Fore.RED))
+    except OSError as e:
+        print(colorize(f"  Error: Cannot open '{filepath}': {e.strerror}.", Fore.RED))
         sys.exit(1)
 
 
