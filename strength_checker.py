@@ -141,7 +141,7 @@ class StrengthChecker:
             recs.append('Increase complexity — entropy is too low (<50 bits)')
         for _, ok, msg in patterns:
             if not ok:
-                recs.append(f'Avoid: {msg}')
+                recs.append('Avoid ' + msg[3:] if msg.startswith('No ') else 'Use ' + msg.lower())
         if not recs:
             recs.append('Great password! Store it securely in a password manager.')
         return recs[:5]
